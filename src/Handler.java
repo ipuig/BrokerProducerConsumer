@@ -1,12 +1,13 @@
 import java.net.DatagramSocket;
+import java.net.DatagramPacket;
 
 public abstract class Handler {
 
-    private DatagramSocket serverSocket;
-    private DatagramSocket receiveSocket;
+    public DatagramSocket listenerSocket;
+    public DatagramPacket receivedPacket;
 
-    public Handler(DatagramSocket serverSocket, DatagramSocket receiveSocket) {
-        this.serverSocket = serverSocket;
-        this.receiveSocket = receiveSocket;
+    public Handler(DatagramSocket listenerSocket, DatagramPacket receivedPacket) {
+        this.listenerSocket = listenerSocket;
+        this.receivedPacket = receivedPacket;
     }
 }

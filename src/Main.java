@@ -7,7 +7,8 @@ public class Main {
         
 
         if(args[0].equalsIgnoreCase("broker")) {
-
+            Broker svr = new Broker();
+            svr.start();
         } 
         else if(args[0].equalsIgnoreCase("producer")) {
 

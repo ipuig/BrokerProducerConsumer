@@ -20,6 +20,8 @@ public class Broker extends NNode {
 
         while(true) {
 
+            receive();
+
         }
 
     }
@@ -29,13 +31,22 @@ public class Broker extends NNode {
     }
 
     public void receive() {
+        try {
+            byte[] receiveData = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            serverSocket.receive(receivePacket);
+            threadPool.submit(new BrokerHandler(serverSocket, receivePacket));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
-    private static class BrokerHandler extends Handler {
+    private static class BrokerHandler extends Handler implements Runnable {
 
-        public BrokerHandler(DatagramSocket server, DatagramSocket receive) {
-            super(server, receive);
+
+        public BrokerHandler(DatagramSocket server, DatagramPacket packet) {
+            super(server, packet);
         }
         
 

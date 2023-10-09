@@ -19,6 +19,7 @@ public class Consumer extends NNode {
 
         while(true) {
 
+
         }
 
     }
@@ -33,8 +34,8 @@ public class Consumer extends NNode {
 
     private static class ConsumerHandler extends Handler {
 
-        public ConsumerHandler(DatagramSocket server, DatagramSocket receive) {
-            super(server, receive);
+        public ConsumerHandler(DatagramSocket server, DatagramPacket packet) {
+            super(server, packet);
         }
         
 

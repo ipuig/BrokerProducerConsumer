@@ -33,8 +33,8 @@ public class Producer extends NNode {
 
     private static class ProducerHandler extends Handler {
 
-        public ProducerHandler(DatagramSocket server, DatagramSocket receive) {
-            super(server, receive);
+        public ProducerHandler(DatagramSocket server, DatagramPacket packet) {
+            super(server, packet);
         }
         
 
