@@ -52,7 +52,12 @@ public class Broker extends NNode {
 
         public void run() {
 
+
             try {
+
+            System.out.println(receivedPacket);
+            System.out.println("+ hello");
+
 
                 // TODO: process request
                 

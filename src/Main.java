@@ -11,6 +11,8 @@ public class Main {
             svr.start();
         } 
         else if(args[0].equalsIgnoreCase("producer")) {
+            Producer svr = new Producer();
+            svr.start();
 
         }
         else if(args[0].equalsIgnoreCase("consumer")) {

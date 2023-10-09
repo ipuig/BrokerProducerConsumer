@@ -1,5 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.Executors;
 
 public class Producer extends NNode {
@@ -19,11 +20,49 @@ public class Producer extends NNode {
 
         while(true) {
 
+            try {
+
+                Thread.sleep(2000);
+                send();
+
+            }
+            catch(Exception e) {
+
+            }
+
         }
 
     }
 
     public void send() {
+
+        // Create a sample header
+        byte packetType = 1; // Example packet type
+        byte payloadLength = 10; // Example payload length
+        byte[] producerIdentifier = "ABC".getBytes(); // Example producer identifier
+        byte streamIdentifier = 1; // Example stream identifier
+        byte[] subscriberInformation = "SubscriberInfo".getBytes(); // Example subscriber information
+
+        Header header = new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, subscriberInformation);
+
+        // Create a sample payload (e.g., video frame)
+        byte[] payload = "VideoFrame".getBytes(); // Replace with your actual video frame data
+
+        // Combine the header and payload into a packet
+        byte[] headerData = header.encode();
+        byte[] packetData = new byte[headerData.length + payload.length];
+        System.arraycopy(headerData, 0, packetData, 0, headerData.length);
+        System.arraycopy(payload, 0, packetData, headerData.length, payload.length);
+
+        // Create a DatagramPacket and send it to the broker
+        try {
+            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName("localhost"), BROKER_PORT);
+            serverSocket.send(sendPacket);
+
+        }
+        catch(Exception e) {
+
+        }
 
     }
 
