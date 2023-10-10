@@ -20,6 +20,8 @@ public class Consumer extends NNode {
     public void start() {
 
         Scanner in = new Scanner(System.in);
+        String input = "";
+        String[] inputs;
         byte first, second, third = 0;
         byte[] selectedProducer;
         byte[] encodedProducerId;
@@ -40,28 +42,24 @@ public class Consumer extends NNode {
                     break;
 
                 case "subscribe":
-                    System.out.println("Type the node id to subscribe");
-                    System.out.print("First byte: ");
-                    first = in.nextByte();
-                    System.out.print("\nSecond byte: ");
-                    second = in.nextByte();
-                    System.out.print("\nThird byte: ");
-                    third = in.nextByte();
-                    System.out.println();
+                    System.out.println("Type the node id to subscribe ie: <20:21:48>");
+                    input = in.next();
+                    inputs = input.split(":");
+                    first = Byte.parseByte(inputs[0]);
+                    second = Byte.parseByte(inputs[1]);
+                    third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
                     send((byte) 13, (byte) encodedProducerId.length, (byte) 0, new byte[] {0, 0}, encodedProducerId, BROKER_PORT);
                     break;
 
                 case "unsubscribe":
-                    System.out.println("Type the node id to unsubscribe");
-                    System.out.print("First byte: ");
-                    first = in.nextByte();
-                    System.out.print("\nSecond byte: ");
-                    second = in.nextByte();
-                    System.out.print("\nThird byte: ");
-                    third = in.nextByte();
-                    System.out.println();
+                    System.out.println("Type the node id to unsubscribe ie: <20:21:48>");
+                    input = in.next();
+                    inputs = input.split(":");
+                    first = Byte.parseByte(inputs[0]);
+                    second = Byte.parseByte(inputs[1]);
+                    third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
                     send((byte) 14, (byte) encodedProducerId.length, (byte) 0, new byte[] {0, 0}, encodedProducerId, BROKER_PORT);
