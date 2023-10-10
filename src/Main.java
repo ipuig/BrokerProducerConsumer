@@ -16,7 +16,8 @@ public class Main {
 
         }
         else if(args[0].equalsIgnoreCase("consumer")) {
-
+            Consumer svr = new Consumer();
+            svr.start();
         }
         else {
             GetIp.getIp();

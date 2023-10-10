@@ -25,9 +25,9 @@ public class Producer extends NNode {
 
             try {
 
+                new Thread(() -> receive()).start(); 
                 Thread.sleep(2000);
                 send((byte) 10, (byte) 9, (byte) 1, new byte[] {0xF, 1}, "VideoFrame".getBytes(), BROKER_PORT);
-                receive();
 
             }
             catch(Exception e) {
