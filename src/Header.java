@@ -1,29 +1,30 @@
 import java.nio.ByteBuffer;
 
 public class Header {
+    public static byte HEADER_LENGTH = 8;
     private byte packetType;
     private byte payloadLength;
     private byte[] producerIdentifier;
     private byte streamIdentifier;
-    private byte[] subscriberInformation;
+    private byte[] payloadLabel;
 
     // Constructor to initialize header fields
-    public Header(byte packetType, byte payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte[] subscriberInformation) {
+    public Header(byte packetType, byte payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte[] payloadLabel) {
         this.packetType = packetType;
         this.payloadLength = payloadLength;
         this.producerIdentifier = producerIdentifier;
         this.streamIdentifier = streamIdentifier;
-        this.subscriberInformation = subscriberInformation;
+        this.payloadLabel = payloadLabel;
     }
 
     // Encode the header into a byte array
     public byte[] encode() {
-        ByteBuffer buffer = ByteBuffer.allocate(8 + subscriberInformation.length);
+        ByteBuffer buffer = ByteBuffer.allocate(HEADER_LENGTH + payloadLabel.length);
         buffer.put(packetType);
         buffer.put(payloadLength);
         buffer.put(producerIdentifier);
         buffer.put(streamIdentifier);
-        buffer.put(subscriberInformation);
+        buffer.put(payloadLabel);
         return buffer.array();
     }
 
@@ -35,10 +36,10 @@ public class Header {
         byte[] producerIdentifier = new byte[3];
         buffer.get(producerIdentifier);
         byte streamIdentifier = buffer.get();
-        byte[] subscriberInformation = new byte[data.length - 8];
-        buffer.get(subscriberInformation);
+        byte[] payloadLabel = new byte[data.length - HEADER_LENGTH];
+        buffer.get(payloadLabel);
 
-        return new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, subscriberInformation);
+        return new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, payloadLabel);
     }
     
     // Getter methods for header fields
@@ -58,7 +59,7 @@ public class Header {
         return streamIdentifier;
     }
 
-    public byte[] getSubscriberInformation() {
-        return subscriberInformation;
+    public byte[] getPayloadLabel() {
+        return payloadLabel;
     }
 }

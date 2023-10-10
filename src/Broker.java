@@ -55,16 +55,29 @@ public class Broker extends NNode {
 
             try {
 
-            System.out.println(receivedPacket);
-            System.out.println("+ hello");
+            
+            // Extract the received packet data
+            byte[] packetData = receivedPacket.getData();
+            int packetLength = receivedPacket.getLength();
 
+            // Extract the header from the packet data
+            Header receivedHeader = Header.decode(packetData);
 
-                // TODO: process request
-                
-                // TODO: extract binary header and encoded data
-                
-                // TODO: decode and handle the binary header as needed
-                
+            // Process the received packet from the receiver's point of view
+            byte receivedPacketType = receivedHeader.getPacketType();
+            byte[] receivedProducerIdentifier = receivedHeader.getProducerIdentifier();
+            byte receivedStreamIdentifier = receivedHeader.getStreamIdentifier();
+            byte[] receivedPayloadLabel = receivedHeader.getPayloadLabel();
+
+            // Process the payload (e.g., video frame)
+            byte[] payload = new byte[packetLength - Header.HEADER_LENGTH];
+            System.arraycopy(packetData, Header.HEADER_LENGTH, payload, 0, packetLength - Header.HEADER_LENGTH);
+
+            // Print received information
+            printPacketData(receivedPacketType, receivedProducerIdentifier,
+                    receivedStreamIdentifier, receivedPayloadLabel, payload);
+            
+
                 // TODO: Handle responses according to header
                 
                 // TODO: send an acknowledgement back to the sender

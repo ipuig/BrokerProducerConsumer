@@ -36,14 +36,14 @@ public class Producer extends NNode {
 
     public void send() {
 
-        // Create a sample header
+        // Create header
         byte packetType = 1; // Example packet type
-        byte payloadLength = 10; // Example payload length
-        byte[] producerIdentifier = "ABC".getBytes(); // Example producer identifier
+        byte payloadLength = 9; // Example payload length
+        byte[] producerIdentifier = { (byte) 0xff, (byte) 0xff, (byte) 0xEF };
         byte streamIdentifier = 1; // Example stream identifier
-        byte[] subscriberInformation = "SubscriberInfo".getBytes(); // Example subscriber information
+        byte[] payloadLabel = {0,0}; // Time, frame
 
-        Header header = new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, subscriberInformation);
+        Header header = new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, payloadLabel);
 
         // Create a sample payload (e.g., video frame)
         byte[] payload = "VideoFrame".getBytes(); // Replace with your actual video frame data
