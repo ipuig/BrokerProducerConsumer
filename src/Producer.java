@@ -26,34 +26,12 @@ public class Producer extends NNode {
             try {
 
                 Thread.sleep(2000);
-                send((byte) 10, (byte) 9, (byte) 1, new byte[] {0xF, 1}, "VideoFrame".getBytes());
+                send((byte) 10, (byte) 9, (byte) 1, new byte[] {0xF, 1}, "VideoFrame".getBytes(), BROKER_PORT);
 
             }
             catch(Exception e) {
 
             }
-
-        }
-
-    }
-
-    public void send(byte packetType, byte payloadLength, byte stream, byte[] payloadLabel, byte[] payload) {
-        
-        Header header = new Header(packetType, payloadLength, nodeId, stream, payloadLabel);
-
-        // Combine the header and payload into a packet
-        byte[] headerData = header.encode();
-        byte[] packetData = new byte[headerData.length + payload.length];
-        System.arraycopy(headerData, 0, packetData, 0, headerData.length);
-        System.arraycopy(payload, 0, packetData, headerData.length, payload.length);
-
-        // Create a DatagramPacket and send it to the broker
-        try {
-            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName("localhost"), BROKER_PORT);
-            serverSocket.send(sendPacket);
-
-        }
-        catch(Exception e) {
 
         }
 

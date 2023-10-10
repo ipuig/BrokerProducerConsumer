@@ -27,10 +27,6 @@ public class Consumer extends NNode {
 
     }
 
-    public void send(byte packetType, byte payloadLength, byte stream, byte[] payloadLabel, byte[] payload) {
-
-    }
-
     public void receive() {
 
     }

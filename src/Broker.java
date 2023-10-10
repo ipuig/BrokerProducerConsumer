@@ -30,11 +30,6 @@ public class Broker extends NNode {
 
     }
 
-    public void send(byte packetType, byte payloadLength, byte stream, byte[] payloadLabel, byte[] payload) {
-
-    }
-
-
     public void receive() {
         try {
             byte[] receiveData = new byte[1024];
@@ -60,7 +55,7 @@ public class Broker extends NNode {
 
             try {
 
-            
+
             // Extract the received packet data
             byte[] packetData = receivedPacket.getData();
             int packetLength = receivedPacket.getLength();
@@ -81,10 +76,25 @@ public class Broker extends NNode {
             // Print received information
             printPacketData(receivedPacketType, receivedProducerIdentifier,
                     receivedStreamIdentifier, receivedPayloadLabel, payload);
-            
 
-                // TODO: Handle responses according to header
-                
+            switch(receivedPacketType) {
+
+                case 10: // publish
+                    break;
+                case 11: // list request
+                    break;
+                case 62: // after sending list data
+                    break;
+                case 13: // subscribe request
+                    break;
+                case 14: // unsubscribe request
+                    break;
+                case 65: // ACK from forward
+                    break;
+
+
+            }
+            
                 // TODO: send an acknowledgement back to the sender
                 
             } catch (Exception e) {
