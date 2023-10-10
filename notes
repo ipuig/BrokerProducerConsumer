@@ -9,22 +9,22 @@ Header (8 Bytes)
 Packet types:
 
     - PUBLISH 10 (Producer->Broker)
-    - PUBLISH ACK 110 (Broker->Producer)
+    - PUBLISH ACK 60 (Broker->Producer)
 
     - LIST REQUEST 11 (Consumer->Broker)
-    - LIST REQUEST ACK 111 (Broker->Consumer)
+    - LIST REQUEST ACK 61 (Broker->Consumer)
     
     - LIST DATA 12 (Broker->Consumer)
-    - LIST DATA ACK 112 (Consumer->Broker)
+    - LIST DATA ACK 62 (Consumer->Broker)
 
     - SUBSCRIBE 13 (Consumer->Broker)
-    - SUBSCRIBE ACK 113 (Broker->Consumer)
+    - SUBSCRIBE ACK 63 (Broker->Consumer)
 
     - UNSUBSCRIBE 14 (Consumer->Broker)
-    - UNSUBSCRIBE ACK 114 (Broker->Consumer)
+    - UNSUBSCRIBE ACK 64 (Broker->Consumer)
 
     - FORWARD 15 (Broker->Consumer)
-    - FORWARD ACK 115 (Consumer->Broker)
+    - FORWARD ACK 65 (Consumer->Broker)
 
 Payload length: size of the payload in bytes
 
@@ -53,10 +53,14 @@ PLabel
 
 Payload types:
 
-    - audio file 0xAF
-    - frame file 0xFF
+    - audio file 0xA
+    - frame file 0xF
+    - producer list 0x9
+    - producerId 0xE
     - Nothing 0
 
 Payload times:
-    - the byte number represents the timestamp
+    - audio/frames: the byte number represents the timestamp
+    - if it is not a file: 0
+    - available producer size: n 
     
