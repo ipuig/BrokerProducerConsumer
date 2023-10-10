@@ -62,7 +62,6 @@ public class Broker extends NNode {
 
         public void run() {
 
-
             try {
                 unpack();
                 printPacketData();
@@ -73,13 +72,12 @@ public class Broker extends NNode {
                     case 10: // publish
                         send((byte) 60, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort());
                         subscribers.putIfAbsent(encodedId, new ArrayList<Integer>(List.of(receivedPacket.getPort())));
-                        // TODO: send FORWARD to subscribers
+
                         List<Integer> forwardPorts = subscribers.get(encodedId);
                         System.out.println(forwardPorts);
                         if(forwardPorts.size() > 1) {
 
                             Iterator ports = forwardPorts.iterator();
-                            System.out.println("It has subscribers");
                             ports.next(); // skip the first port, as it is the producers
                             while(ports.hasNext()) {
 
@@ -116,13 +114,12 @@ public class Broker extends NNode {
                         send((byte) 64, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
                         
                         if(subscribers.containsKey(new String(payload).trim())) {
-                            subscribers.get(new String(payload).trim()).remove(receivedPacket.getPort()); // delete from subscribers
+                            subscribers.get(new String(payload).trim()).remove((Integer) receivedPacket.getPort()); // delete from subscribers
                         }
 
                         break;
                     default:
                         break;
-
 
                 }
 
