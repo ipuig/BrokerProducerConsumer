@@ -5,6 +5,9 @@ import java.util.concurrent.Executors;
 public class Consumer extends NNode {
 
     public Consumer() {
+
+        super((byte) 0xC);
+
         try {
             this.serverSocket = new DatagramSocket();
             this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -24,7 +27,7 @@ public class Consumer extends NNode {
 
     }
 
-    public void send() {
+    public void send(byte packetType, byte payloadLength, byte stream, byte[] payloadLabel, byte[] payload) {
 
     }
 

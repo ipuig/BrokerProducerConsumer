@@ -4,7 +4,11 @@ import java.util.concurrent.Executors;
 
 public class Broker extends NNode {
 
+
     public Broker() {
+
+        super((byte) 0xA);
+
         try {
             this.serverSocket = new DatagramSocket(BROKER_PORT);
             this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -26,9 +30,10 @@ public class Broker extends NNode {
 
     }
 
-    public void send() {
+    public void send(byte packetType, byte payloadLength, byte stream, byte[] payloadLabel, byte[] payload) {
 
     }
+
 
     public void receive() {
         try {

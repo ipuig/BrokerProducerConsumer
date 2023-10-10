@@ -5,4 +5,5 @@ public class GetIp {
     public static void getIp() throws UnknownHostException {
         System.out.println(InetAddress.getLocalHost().getHostAddress());
     }
+    
 }
