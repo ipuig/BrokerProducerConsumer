@@ -15,6 +15,7 @@ public abstract class Handler {
     public int packetLength;
     public Header receivedHeader;
     public byte receivedPacketType;
+    public byte receivedPayloadLength;
     public byte receivedStreamIdentifier;
     public byte[] receivedProducerIdentifier;
     public byte[] receivedPayloadLabel;
@@ -30,6 +31,7 @@ public abstract class Handler {
 
             // Process the received packet from the receiver's point of view
             receivedPacketType = receivedHeader.getPacketType();
+            receivedPayloadLength = receivedHeader.getPayloadLength();
             receivedProducerIdentifier = receivedHeader.getProducerIdentifier();
             receivedStreamIdentifier = receivedHeader.getStreamIdentifier();
             receivedPayloadLabel = receivedHeader.getPayloadLabel();
@@ -119,7 +121,7 @@ public abstract class Handler {
 
             }
 
-            if(receivedPacketType < 60) // print payload when is not an ACK
+            if(receivedPayloadLength > 0) 
                 System.out.println("Received Payload: " + new String(payload));
 
     }

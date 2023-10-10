@@ -59,4 +59,13 @@ public abstract class NNode {
         }
 
     }
+
+    public String encodeId(byte[] id) {
+        return String.format("%d:%d:%d", id[0], id[1], id[2]);
+    }
+
+    public byte[] decodeId(String id) {
+        String[] d = id.split(":");
+        return new byte[] {Byte.parseByte(d[0]), Byte.parseByte(d[1]), Byte.parseByte(d[2])};
+    }
 }

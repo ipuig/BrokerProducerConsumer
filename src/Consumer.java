@@ -21,6 +21,7 @@ public class Consumer extends NNode {
 
         Scanner in = new Scanner(System.in);
         byte first, second, third = 0;
+        byte[] selectedProducer;
 
         while(true) {
 
@@ -41,7 +42,9 @@ public class Consumer extends NNode {
                     System.out.print("\nThird byte: ");
                     third = in.nextByte();
                     System.out.println();
-                    send((byte) 13, (byte) 3, (byte) 0, new byte[] {0, 0}, new byte[] {first, second, third}, BROKER_PORT);
+                    selectedProducer = new byte[] {first, second, third};
+                    byte[] encodedProducerId = encodeId(selectedProducer).getBytes();
+                    send((byte) 13, (byte) encodedProducerId.length, (byte) 0, new byte[] {0, 0}, encodedProducerId, BROKER_PORT);
                     break;
 
                 case "unsubscribe":
@@ -60,8 +63,7 @@ public class Consumer extends NNode {
                     break;
             }
 
-
-
+            new Thread(() -> receive()).start(); 
 
         }
 
