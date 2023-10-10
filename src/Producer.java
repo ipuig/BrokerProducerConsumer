@@ -27,6 +27,7 @@ public class Producer extends NNode {
 
                 Thread.sleep(2000);
                 send((byte) 10, (byte) 9, (byte) 1, new byte[] {0xF, 1}, "VideoFrame".getBytes(), BROKER_PORT);
+                receive();
 
             }
             catch(Exception e) {
@@ -39,9 +40,18 @@ public class Producer extends NNode {
 
     public void receive() {
 
+        try {
+            byte[] receiveData = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            serverSocket.receive(receivePacket);
+            threadPool.submit(new ProducerHandler(serverSocket, receivePacket));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private static class ProducerHandler extends Handler {
+    private static class ProducerHandler extends Handler implements Runnable {
 
         public ProducerHandler(DatagramSocket server, DatagramPacket packet) {
             super(server, packet);
@@ -52,15 +62,8 @@ public class Producer extends NNode {
 
             try {
 
-                // TODO: process request
-                
-                // TODO: extract binary header and encoded data
-                
-                // TODO: decode and handle the binary header as needed
-                
-                // TODO: Handle responses according to header
-                
-                // TODO: send an acknowledgement back to the sender
+                unpack();
+                printPacketData();
                 
             } catch (Exception e) {
 

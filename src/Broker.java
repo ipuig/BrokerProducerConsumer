@@ -42,61 +42,42 @@ public class Broker extends NNode {
 
     }
 
-    private static class BrokerHandler extends Handler implements Runnable {
+    private class BrokerHandler extends Handler implements Runnable {
 
 
         public BrokerHandler(DatagramSocket server, DatagramPacket packet) {
             super(server, packet);
         }
-        
+
 
         public void run() {
 
 
             try {
+                unpack();
+                printPacketData();
+                switch(receivedPacketType) {
+
+                    case 10: // publish
+                        send((byte) 60, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort());
+                        // TODO: send FORWARD to subscribers
+                        break;
+                    case 11: // list request
+                        break;
+                    case 62: // after sending list data
+                        break;
+                    case 13: // subscribe request
+                        break;
+                    case 14: // unsubscribe request
+                        break;
+                    case 65: // ACK from forward
+                        break;
 
 
-            // Extract the received packet data
-            byte[] packetData = receivedPacket.getData();
-            int packetLength = receivedPacket.getLength();
+                }
 
-            // Extract the header from the packet data
-            Header receivedHeader = Header.decode(packetData);
-
-            // Process the received packet from the receiver's point of view
-            byte receivedPacketType = receivedHeader.getPacketType();
-            byte[] receivedProducerIdentifier = receivedHeader.getProducerIdentifier();
-            byte receivedStreamIdentifier = receivedHeader.getStreamIdentifier();
-            byte[] receivedPayloadLabel = receivedHeader.getPayloadLabel();
-
-            // Process the payload (e.g., video frame)
-            byte[] payload = new byte[packetLength - Header.HEADER_LENGTH];
-            System.arraycopy(packetData, Header.HEADER_LENGTH, payload, 0, packetLength - Header.HEADER_LENGTH);
-
-            // Print received information
-            printPacketData(receivedPacketType, receivedProducerIdentifier,
-                    receivedStreamIdentifier, receivedPayloadLabel, payload);
-
-            switch(receivedPacketType) {
-
-                case 10: // publish
-                    break;
-                case 11: // list request
-                    break;
-                case 62: // after sending list data
-                    break;
-                case 13: // subscribe request
-                    break;
-                case 14: // unsubscribe request
-                    break;
-                case 65: // ACK from forward
-                    break;
-
-
-            }
-            
                 // TODO: send an acknowledgement back to the sender
-                
+
             } catch (Exception e) {
 
             }
@@ -104,5 +85,5 @@ public class Broker extends NNode {
         }
 
     }
-    
+
 }

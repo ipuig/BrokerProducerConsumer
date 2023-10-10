@@ -11,9 +11,37 @@ public abstract class Handler {
         this.receivedPacket = receivedPacket;
     }
 
+    public byte[] packetData;
+    public int packetLength;
+    public Header receivedHeader;
+    public byte receivedPacketType;
+    public byte receivedStreamIdentifier;
+    public byte[] receivedProducerIdentifier;
+    public byte[] receivedPayloadLabel;
+    public byte[] payload;
 
-    public void printPacketData(byte receivedPacketType, byte[] receivedProducerIdentifier,
-            byte receivedStreamIdentifier, byte[] receivedPayloadLabel, byte[] payload) {
+    public void unpack() {
+            // Extract the received packet data
+            packetData = receivedPacket.getData();
+            packetLength = receivedPacket.getLength();
+
+            // Extract the header from the packet data
+            receivedHeader = Header.decode(packetData);
+
+            // Process the received packet from the receiver's point of view
+            receivedPacketType = receivedHeader.getPacketType();
+            receivedProducerIdentifier = receivedHeader.getProducerIdentifier();
+            receivedStreamIdentifier = receivedHeader.getStreamIdentifier();
+            receivedPayloadLabel = receivedHeader.getPayloadLabel();
+
+            // Process the payload (e.g., video frame)
+            payload = new byte[packetLength - Header.HEADER_LENGTH];
+            System.arraycopy(packetData, Header.HEADER_LENGTH, payload, 0, packetLength - Header.HEADER_LENGTH);
+
+    }
+
+
+    public void printPacketData() {
 
             switch(receivedPacketType) {
                 case 10:
@@ -91,7 +119,8 @@ public abstract class Handler {
 
             }
 
-            System.out.println("Received Payload: " + new String(payload));
+            if(receivedPacketType < 60) // print payload when is not an ACK
+                System.out.println("Received Payload: " + new String(payload));
 
     }
 }
