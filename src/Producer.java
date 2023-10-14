@@ -3,7 +3,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.Executors;
 
-public class Producer extends NNode {
+public class Producer extends NNode implements Stream {
 
     private ProducerType mode;
 
@@ -35,9 +35,27 @@ public class Producer extends NNode {
         }
     }
 
+    private boolean streamVideo(int currentVideoFrame) {
+        byte[] payload = loadFile(PRODUCER_VIDEO_FRAMES_PATH + String.format("frame%03d.png", currentVideoFrame));
+        if (payload.length == 0) return false;
+        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        return true;
+    }
+
+    private boolean streamAudio(int currentAudioChunk) {
+        byte[] payload = loadFile(PRODUCER_AUDIO_CHUNKS_PATH + String.format("frame%03d.png", currentAudioChunk));
+        if (payload.length == 0) return false;
+        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        return true;
+    }
+
+    private void streamText() {
+    }
+
 
     public void start() {
 
+        int currentFrame = 1;
 
         while(true) {
 
@@ -48,18 +66,18 @@ public class Producer extends NNode {
 
                 switch(mode) {
                     case AUDIO_STREAMER:
-                        System.out.println("Audio producer");
+                        if(streamAudio()) currentFrame++;
+                        else currentFrame = 1;
                         break;
                     case VIDEO_STREAMER:
-                        System.out.println("Video producer");
+                        if(streamVideo()) currentFrame++;
+                        else currentFrame = 1;
                         break;
+                    default:
                     case TEXT_STREAMER:
-                        System.out.println("Text producer");
+                        streamText();
                         break;
                 }
-
-                send((byte) 10, (byte) 9, (byte) 1, new byte[] {0xF, 1}, "Text video frame".getBytes(), BROKER_PORT);
-
             }
             catch(Exception e) {
 
