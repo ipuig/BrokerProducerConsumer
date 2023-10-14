@@ -21,6 +21,33 @@ public abstract class NNode {
         VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER;
     }
 
+    public static enum PAYLOAD_TYPE {
+        NOTHING(0),
+        AUDIO(0xA),
+        VIDEO(0xB),
+        TEXT(0xC),
+        PRODUCER_LIST(0xD),
+        PRODUCER_ID(0xE);
+
+        private byte value;
+
+        PAYLOAD_TYPE(int value) {
+            this.value = (byte) value;
+        }
+
+        public byte getValue() {
+            return value;
+        }
+
+        public static PAYLOAD_TYPE fromValue(byte value) {
+            for (PAYLOAD_TYPE type : values()) {
+                if (type.value == value) return type;
+            }
+            return PAYLOAD_TYPE.NOTHING;
+
+        }
+    }
+
     public static enum NODE_TYPE {
         PRODUCER(0xE), CONSUMER(0xC), BROKER(0xA);
 
@@ -72,9 +99,9 @@ public abstract class NNode {
 
     }
 
-    public void send(byte type, int length, byte stream, byte[] label, byte[] payload, int port) {
+    public void send(byte type, int length, byte stream, byte label, short frameNumber, byte[] payload, int port) {
 
-        Header header = new Header(type, length, nodeId, stream, label);
+        Header header = new Header(type, length, nodeId, stream, label, frameNumber);
 
         // Combine the header and payload into a packet
         byte[] headerData = header.encode();

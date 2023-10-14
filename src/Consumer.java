@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 public class Consumer extends NNode {
 
+    public static int BUFFER_SIZE = 30 * 1024;
+
     public Consumer() {
 
         super(NODE_TYPE.CONSUMER);
@@ -38,7 +40,7 @@ public class Consumer extends NNode {
             switch(in.next()) {
 
                 case "list":
-                    send(PACKET_TYPE.LIST_REQUEST.getValue(), 0, (byte) 0, new byte[] {0, 0}, new byte[0], BROKER_PORT);
+                    send(PACKET_TYPE.LIST_REQUEST.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], BROKER_PORT);
                     break;
 
                 case "subscribe":
@@ -50,7 +52,7 @@ public class Consumer extends NNode {
                     third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
-                    send(PACKET_TYPE.SUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, new byte[] {0, 0}, encodedProducerId, BROKER_PORT);
+                    send(PACKET_TYPE.SUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_PORT);
                     break;
 
                 case "unsubscribe":
@@ -62,7 +64,7 @@ public class Consumer extends NNode {
                     third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
-                    send(PACKET_TYPE.UNSUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, new byte[] {0, 0}, encodedProducerId, BROKER_PORT);
+                    send(PACKET_TYPE.UNSUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_PORT);
                     break;
 
                 default:
@@ -75,7 +77,7 @@ public class Consumer extends NNode {
     public void receive() {
 
         try {
-            byte[] receiveData = new byte[1024];
+            byte[] receiveData = new byte[BUFFER_SIZE];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
             threadPool.submit(new ConsumerHandler(serverSocket, receivePacket));
@@ -84,7 +86,7 @@ public class Consumer extends NNode {
         }
     }
 
-    private static class ConsumerHandler extends Handler implements Runnable {
+    private static class ConsumerHandler extends Handler implements Runnable, Stream {
 
         public ConsumerHandler(DatagramSocket server, DatagramPacket packet) {
             super(server, packet);
@@ -97,6 +99,26 @@ public class Consumer extends NNode {
 
                 unpack();
                 printPacketData();
+
+                // store video, audio, text
+                if (PACKET_TYPE.fromValue(receivedPacketType) == PACKET_TYPE.FORWARD) {
+
+
+                    switch(PAYLOAD_TYPE.fromValue(receivedPayloadLabel)) {
+                        case VIDEO:
+                            storeFile(CONSUMER_DATA_OUTPUT + "video/" + String.format("receivedFrame%03d.png", receivedFrameNumber), payload);
+                            break;
+                        case AUDIO:
+                            storeFile(CONSUMER_DATA_OUTPUT + "audio/" + String.format("receivedAudio%03d.wav", receivedFrameNumber), payload);
+                            break;
+                        case TEXT:
+                            storeFile(CONSUMER_DATA_OUTPUT + "text/" + String.format("receivedText%03d.txt", receivedFrameNumber), payload);
+                            break;
+                        default:
+                        case NOTHING:
+                            break;
+                    }
+                }
                 
             } catch (Exception e) {
 

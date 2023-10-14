@@ -12,10 +12,6 @@ public interface Stream {
 
     public static String CONSUMER_DATA_OUTPUT = "consumer_data/";
 
-    // default void createDir() {
-    //
-    // }
-
     public default byte[] loadFile(String filePath) {
 
         try {
@@ -30,10 +26,14 @@ public interface Stream {
 
     }
 
-    // default void storeFile() {
-    //
-    // }
-    //
+    public default void storeFile(String filePath, byte[] data) {
+        try {
+            Path path = Path.of(filePath);
+            Files.write(path, data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public default byte[] generateRandomString() {
         Random random = new Random();

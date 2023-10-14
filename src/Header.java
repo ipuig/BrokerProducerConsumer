@@ -1,30 +1,33 @@
 import java.nio.ByteBuffer;
 
 public class Header {
-    public static byte HEADER_LENGTH = 11;
+    public static byte HEADER_LENGTH = 12;
     private byte packetType;
     private int payloadLength;
     private byte[] producerIdentifier;
     private byte streamIdentifier;
-    private byte[] payloadLabel;
+    private byte payloadLabel;
+    private short frameNumber;
 
     // Constructor to initialize header fields
-    public Header(byte packetType, int payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte[] payloadLabel) {
+    public Header(byte packetType, int payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte payloadLabel, short frameNumber) {
         this.packetType = packetType;
         this.payloadLength = payloadLength;
         this.producerIdentifier = producerIdentifier;
         this.streamIdentifier = streamIdentifier;
         this.payloadLabel = payloadLabel;
+        this.frameNumber = frameNumber;
     }
 
     // Encode the header into a byte array
     public byte[] encode() {
-        ByteBuffer buffer = ByteBuffer.allocate(HEADER_LENGTH + payloadLabel.length);
+        ByteBuffer buffer = ByteBuffer.allocate(HEADER_LENGTH);
         buffer.put(packetType);
         buffer.putInt(payloadLength);
         buffer.put(producerIdentifier);
         buffer.put(streamIdentifier);
         buffer.put(payloadLabel);
+        buffer.putShort(frameNumber);
         return buffer.array();
     }
 
@@ -36,10 +39,10 @@ public class Header {
         byte[] producerIdentifier = new byte[3];
         buffer.get(producerIdentifier);
         byte streamIdentifier = buffer.get();
-        byte[] payloadLabel = new byte[data.length - HEADER_LENGTH];
-        buffer.get(payloadLabel);
+        byte payloadLabel = buffer.get();
+        short frameNumber = buffer.getShort();
 
-        return new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, payloadLabel);
+        return new Header(packetType, payloadLength, producerIdentifier, streamIdentifier, payloadLabel, frameNumber);
     }
     
     // Getter methods for header fields
@@ -51,7 +54,7 @@ public class Header {
         return payloadLength;
     }
 
-    public byte[] getProducerIdentifier() {
+    public byte[] getNodeIdentifier() {
         return producerIdentifier;
     }
 
@@ -59,7 +62,11 @@ public class Header {
         return streamIdentifier;
     }
 
-    public byte[] getPayloadLabel() {
+    public byte getPayloadLabel() {
         return payloadLabel;
+    }
+
+    public short getFrameNumber() {
+        return frameNumber;
     }
 }

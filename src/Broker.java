@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 public class Broker extends NNode {
 
+    public static int BUFFER_SIZE = 30 * 1024;
 
     private ConcurrentHashMap<String, List<Integer>> subscribers;
 
@@ -37,19 +38,17 @@ public class Broker extends NNode {
             receive();
 
         }
-
     }
 
     public void receive() {
         try {
-            byte[] receiveData = new byte[1024];
+            byte[] receiveData = new byte[BUFFER_SIZE];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
             threadPool.submit(new BrokerHandler(serverSocket, receivePacket));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private class BrokerHandler extends Handler implements Runnable {
@@ -65,12 +64,12 @@ public class Broker extends NNode {
             try {
                 unpack();
                 printPacketData();
-                String encodedId = encodeId(receivedProducerIdentifier);
+                String encodedId = encodeId(receivedNodeIdentifier);
                 byte[] decodedId;
                 switch(PACKET_TYPE.fromValue(receivedPacketType)) {
 
                     case PUBLISH: 
-                        send(PACKET_TYPE.PUBLISH_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort());
+                        send(PACKET_TYPE.PUBLISH_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], receivedPacket.getPort());
                         subscribers.putIfAbsent(encodedId, new ArrayList<Integer>(List.of(receivedPacket.getPort())));
 
                         List<Integer> forwardPorts = subscribers.get(encodedId);
@@ -82,7 +81,7 @@ public class Broker extends NNode {
                             while(ports.hasNext()) {
 
                                 Integer val = (Integer) ports.next();
-                                send(PACKET_TYPE.FORWARD.getValue(), receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, payload, val.intValue());
+                                send(PACKET_TYPE.FORWARD.getValue(), receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, receivedFrameNumber, payload, val.intValue());
                                 
                             }
 
@@ -90,7 +89,7 @@ public class Broker extends NNode {
                         break;
 
                     case LIST_REQUEST:
-                        send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
 
                         // Fetching list of producers
                         StringBuilder sb = new StringBuilder();
@@ -99,11 +98,11 @@ public class Broker extends NNode {
                         byte[] listDataPayload = listData.getBytes();
 
                         // Send list
-                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, new byte[] {0,0}, listDataPayload, receivedPacket.getPort());
+                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, listDataPayload, receivedPacket.getPort());
                         break;
 
                     case SUBSCRIBE: 
-                        send(PACKET_TYPE.SUBSCRIBE_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.SUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
                                                                                                                         
                         if(subscribers.containsKey(new String(payload).trim())) {
                             subscribers.get(new String(payload).trim()).add(receivedPacket.getPort()); // Add to subscribers
@@ -111,7 +110,7 @@ public class Broker extends NNode {
 
                         break;
                     case UNSUBSCRIBE:
-                        send(PACKET_TYPE.UNSUBSCRIBE_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.UNSUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
                         
                         if(subscribers.containsKey(new String(payload).trim())) {
                             subscribers.get(new String(payload).trim()).remove((Integer) receivedPacket.getPort()); // delete from subscribers

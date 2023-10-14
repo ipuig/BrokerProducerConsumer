@@ -38,20 +38,22 @@ public class Producer extends NNode implements Stream {
     private boolean streamVideo(int currentVideoFrame) {
         byte[] payload = loadFile(PRODUCER_VIDEO_FRAMES_PATH + String.format("frame%03d.png", currentVideoFrame));
         if (payload.length == 0) return false;
-        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, PAYLOAD_TYPE.VIDEO.getValue(), (short) currentVideoFrame, payload, BROKER_PORT);
         return true;
     }
 
     private boolean streamAudio(int currentAudioChunk) {
         byte[] payload = loadFile(PRODUCER_AUDIO_CHUNKS_PATH + String.format("chunk%03d.wav", currentAudioChunk));
         if (payload.length == 0) return false;
-        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, PAYLOAD_TYPE.AUDIO.getValue(), (short) currentAudioChunk, payload, BROKER_PORT);
         return true;
     }
 
-    private void streamText() {
+    private boolean streamText(int currentTextFile) {
+        if (currentTextFile == Short.MAX_VALUE) return false;
         byte[] payload = generateRandomString();
-        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, PAYLOAD_TYPE.TEXT.getValue(), (short) currentTextFile, payload, BROKER_PORT);
+        return true;
     }
 
 
@@ -77,7 +79,8 @@ public class Producer extends NNode implements Stream {
                         break;
                     default:
                     case TEXT_STREAMER:
-                        streamText();
+                        if(streamText(currentFrame)) currentFrame++;
+                        else currentFrame = 1;
                         break;
                 }
             }
@@ -92,7 +95,7 @@ public class Producer extends NNode implements Stream {
     public void receive() {
 
         try {
-            byte[] receiveData = new byte[1024];
+            byte[] receiveData = new byte[16]; // producer only receives acks, hence doesn't need more than that
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
             threadPool.submit(new ProducerHandler(serverSocket, receivePacket));

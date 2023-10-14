@@ -18,4 +18,4 @@ ip:
 	java -cp bin Main
 
 clean:
-	rm -rf consumer_data/*
+	rm consumer_data/audio/* && consumer_data/video/* && consumer_data/text/*

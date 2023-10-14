@@ -64,8 +64,9 @@ PLabel
 Payload types:
 
     - audio file 0xA
-    - frame file 0xF
-    - producer list 0x9
+    - video file 0xB
+    - text file 0xC
+    - producer list 0xD
     - producerId 0xE
     - Nothing 0
 

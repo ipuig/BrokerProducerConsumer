@@ -17,8 +17,9 @@ public abstract class Handler {
     public byte receivedPacketType;
     public int receivedPayloadLength;
     public byte receivedStreamIdentifier;
-    public byte[] receivedProducerIdentifier;
-    public byte[] receivedPayloadLabel;
+    public byte[] receivedNodeIdentifier;
+    public byte receivedPayloadLabel;
+    public short receivedFrameNumber;
     public byte[] payload;
 
     public void unpack() {
@@ -32,9 +33,10 @@ public abstract class Handler {
             // Process the received packet from the receiver's point of view
             receivedPacketType = receivedHeader.getPacketType();
             receivedPayloadLength = receivedHeader.getPayloadLength();
-            receivedProducerIdentifier = receivedHeader.getProducerIdentifier();
+            receivedNodeIdentifier = receivedHeader.getNodeIdentifier();
             receivedStreamIdentifier = receivedHeader.getStreamIdentifier();
             receivedPayloadLabel = receivedHeader.getPayloadLabel();
+            receivedFrameNumber = receivedHeader.getFrameNumber();
 
             // Process the payload (e.g., video frame)
             payload = new byte[packetLength - Header.HEADER_LENGTH];
@@ -85,7 +87,7 @@ public abstract class Handler {
 
             }
 
-            switch(receivedProducerIdentifier[0]) {
+            switch(receivedNodeIdentifier[0]) {
                 default:
                     break;
                 case 0xA: 
@@ -99,23 +101,27 @@ public abstract class Handler {
                     break;
 
             }
-            System.out.printf("%x:%x\n", receivedProducerIdentifier[1], receivedProducerIdentifier[2]);
+            System.out.printf("%x:%x\n", receivedNodeIdentifier[1], receivedNodeIdentifier[2]);
 
             if(receivedStreamIdentifier > 0) System.out.printf("Stream identifier %d\n", receivedStreamIdentifier);
 
-            switch(receivedPayloadLabel[0]) {
+            switch(NNode.PAYLOAD_TYPE.fromValue(receivedPayloadLabel)) {
                 default:
+                NOTHING:
                     break;
-                case 0xA:
-                    System.out.printf("Received Payload Label: [Audio, %x]\n", receivedPayloadLabel[2]);
+                case AUDIO:
+                    System.out.printf("Received Payload Label: [Audio, %d]\n", receivedFrameNumber);
                     break;
-                case 0xF:
-                    System.out.printf("Received Payload Label: [Frame, %x]\n", receivedPayloadLabel[2]);
+                case VIDEO:
+                    System.out.printf("Received Payload Label: [Video, %d]\n", receivedFrameNumber);
                     break;
-                case 0xE:
-                    System.out.printf("Received Payload Label: [List] of size %x\n", receivedPayloadLabel[2]);
+                case TEXT:
+                    System.out.printf("Received Payload Label: [Text, %d]\n", receivedFrameNumber);
                     break;
-                case 0x9:
+                case PRODUCER_LIST:
+                    System.out.printf("Received Payload Label: [PList] of size %d\n", receivedFrameNumber);
+                    break;
+                case PRODUCER_ID:
                     System.out.println("Received Payload Label: [Producer]");
                     break;
 
