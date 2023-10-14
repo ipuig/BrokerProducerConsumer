@@ -9,7 +9,7 @@ public class Producer extends NNode implements Stream {
 
     public Producer() {
 
-        super((byte) 0xE); 
+        super(NODE_TYPE.PRODUCER); 
 
         this.mode = PRODUCER_TYPE.TEXT_STREAMER;
 
@@ -23,7 +23,7 @@ public class Producer extends NNode implements Stream {
 
     public Producer(PRODUCER_TYPE mode) {
 
-        super((byte) 0xE); 
+        super(NODE_TYPE.PRODUCER); 
 
         this.mode = mode;
 

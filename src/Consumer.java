@@ -7,7 +7,7 @@ public class Consumer extends NNode {
 
     public Consumer() {
 
-        super((byte) 0xC);
+        super(NODE_TYPE.CONSUMER);
 
         try {
             this.serverSocket = new DatagramSocket();

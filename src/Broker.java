@@ -15,7 +15,7 @@ public class Broker extends NNode {
 
     public Broker() {
 
-        super((byte) 0xA);
+        super(NODE_TYPE.BROKER);
 
         try {
             this.serverSocket = new DatagramSocket(BROKER_PORT);

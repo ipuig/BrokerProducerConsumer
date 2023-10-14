@@ -13,15 +13,26 @@ public abstract class NNode {
     public DatagramSocket serverSocket;
     public ExecutorService threadPool;
 
-    public NNode(byte nodeType) {
-        generateNodeId(nodeType);
+    public NNode(NODE_TYPE type) {
+        generateNodeId(type.getValue());
     }
 
     public static enum PRODUCER_TYPE {
         VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER;
     }
 
-    public static enum PAYLOAD_TYPE {
+    public static enum NODE_TYPE {
+        PRODUCER(0xE), CONSUMER(0xC), BROKER(0xA);
+
+        private byte value;
+
+        NODE_TYPE(int value) {
+            this.value = (byte) value;
+        }
+
+        public byte getValue() {
+            return value;
+        }
 
     }
 
