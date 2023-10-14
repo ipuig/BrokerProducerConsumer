@@ -43,7 +43,7 @@ public class Producer extends NNode implements Stream {
     }
 
     private boolean streamAudio(int currentAudioChunk) {
-        byte[] payload = loadFile(PRODUCER_AUDIO_CHUNKS_PATH + String.format("frame%03d.png", currentAudioChunk));
+        byte[] payload = loadFile(PRODUCER_AUDIO_CHUNKS_PATH + String.format("chunk%03d.wav", currentAudioChunk));
         if (payload.length == 0) return false;
         send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
         return true;
@@ -66,11 +66,11 @@ public class Producer extends NNode implements Stream {
 
                 switch(mode) {
                     case AUDIO_STREAMER:
-                        if(streamAudio()) currentFrame++;
+                        if(streamAudio(currentFrame)) currentFrame++;
                         else currentFrame = 1;
                         break;
                     case VIDEO_STREAMER:
-                        if(streamVideo()) currentFrame++;
+                        if(streamVideo(currentFrame)) currentFrame++;
                         else currentFrame = 1;
                         break;
                     default:

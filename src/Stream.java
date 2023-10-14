@@ -7,7 +7,7 @@ public interface Stream {
     
 
     public static String PRODUCER_VIDEO_FRAMES_PATH = "producer_data/video_frames/";
-    public static String PRODUCER_AUDIO_CHUNKS_PATH = "producer_data/video_frames/";
+    public static String PRODUCER_AUDIO_CHUNKS_PATH = "producer_data/audio_chunks/";
 
     public static String CONSUMER_DATA_OUTPUT = "consumer_data/";
 
