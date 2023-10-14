@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Consumer extends NNode {
 
-    public static int BUFFER_SIZE = 30 * 1024;
+    public static int BUFFER_SIZE = 33 * 1024; // largest frame = 33kb
 
     public Consumer() {
 

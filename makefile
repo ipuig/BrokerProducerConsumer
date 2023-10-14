@@ -1,5 +1,5 @@
 compile:
-	javac -cp bin -d bin src/*.java
+	sh cleanup; javac -cp bin -d bin src/*.java
 
 producer:
 	java -cp bin Main producer

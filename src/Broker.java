@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 public class Broker extends NNode {
 
-    public static int BUFFER_SIZE = 30 * 1024;
+    public static int BUFFER_SIZE = 33 * 1024; // largest frame = 33kb
 
     private ConcurrentHashMap<String, List<Integer>> subscribers;
 
@@ -92,13 +92,14 @@ public class Broker extends NNode {
                         send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
 
                         // Fetching list of producers
+                        short availableProducers = (short) subscribers.size();
                         StringBuilder sb = new StringBuilder();
                         subscribers.forEach((k, v) ->  sb.append(k + "\n"));
                         String listData = sb.toString();
                         byte[] listDataPayload = listData.getBytes();
 
                         // Send list
-                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, listDataPayload, receivedPacket.getPort());
+                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_LIST.getValue(), availableProducers, listDataPayload, receivedPacket.getPort());
                         break;
 
                     case SUBSCRIBE: 
