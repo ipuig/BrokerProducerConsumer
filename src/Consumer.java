@@ -1,5 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.Executors;
 import java.util.Scanner;
 
@@ -40,7 +41,7 @@ public class Consumer extends NNode {
             switch(in.next()) {
 
                 case "list":
-                    send(PACKET_TYPE.LIST_REQUEST.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], BROKER_PORT);
+                    send(PACKET_TYPE.LIST_REQUEST.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], BROKER_IP, BROKER_PORT);
                     break;
 
                 case "subscribe":
@@ -52,7 +53,7 @@ public class Consumer extends NNode {
                     third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
-                    send(PACKET_TYPE.SUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_PORT);
+                    send(PACKET_TYPE.SUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_IP, BROKER_PORT);
                     break;
 
                 case "unsubscribe":
@@ -64,7 +65,7 @@ public class Consumer extends NNode {
                     third = Byte.parseByte(inputs[2]);
                     selectedProducer = new byte[] {first, second, third};
                     encodedProducerId = encodeId(selectedProducer).getBytes();
-                    send(PACKET_TYPE.UNSUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_PORT);
+                    send(PACKET_TYPE.UNSUBSCRIBE.getValue(), encodedProducerId.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_ID.getValue(), (short) 0, encodedProducerId, BROKER_IP, BROKER_PORT);
                     break;
 
                 default:

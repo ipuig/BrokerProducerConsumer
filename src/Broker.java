@@ -1,5 +1,6 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -11,7 +12,7 @@ public class Broker extends NNode {
 
     public static int BUFFER_SIZE = 33 * 1024; // largest frame = 33kb
 
-    private ConcurrentHashMap<String, List<Integer>> subscribers;
+    private ConcurrentHashMap<String, List<PortAddr>> subscribers;
 
 
     public Broker() {
@@ -69,19 +70,18 @@ public class Broker extends NNode {
                 switch(PACKET_TYPE.fromValue(receivedPacketType)) {
 
                     case PUBLISH: 
-                        send(PACKET_TYPE.PUBLISH_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], receivedPacket.getPort());
-                        subscribers.putIfAbsent(encodedId, new ArrayList<Integer>(List.of(receivedPacket.getPort())));
+                        send(PACKET_TYPE.PUBLISH_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], receivedPacket.getAddress().getHostName(), receivedPacket.getPort());
+                        subscribers.putIfAbsent(encodedId, new ArrayList<PortAddr>(List.of(new PortAddr(receivedPacket))));
 
-                        List<Integer> forwardPorts = subscribers.get(encodedId);
-                        System.out.println(forwardPorts);
+                        List<PortAddr> forwardPorts = subscribers.get(encodedId);
                         if(forwardPorts.size() > 1) {
 
                             Iterator ports = forwardPorts.iterator();
                             ports.next(); // skip the first port, as it is the producers
                             while(ports.hasNext()) {
 
-                                Integer val = (Integer) ports.next();
-                                send(PACKET_TYPE.FORWARD.getValue(), receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, receivedFrameNumber, payload, val.intValue());
+                                PortAddr val = (PortAddr) ports.next();
+                                send(PACKET_TYPE.FORWARD.getValue(), receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, receivedFrameNumber, payload, val.getAddr(), val.getPort());
                                 
                             }
 
@@ -89,7 +89,7 @@ public class Broker extends NNode {
                         break;
 
                     case LIST_REQUEST:
-                        send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], receivedPacket.getAddress().getHostName(), receivedPacket.getPort()); // ACK
 
                         // Fetching list of producers
                         short availableProducers = (short) subscribers.size();
@@ -99,24 +99,20 @@ public class Broker extends NNode {
                         byte[] listDataPayload = listData.getBytes();
 
                         // Send list
-                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_LIST.getValue(), availableProducers, listDataPayload, receivedPacket.getPort());
+                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, PAYLOAD_TYPE.PRODUCER_LIST.getValue(), availableProducers, listDataPayload, receivedPacket.getAddress().getHostName(), receivedPacket.getPort());
                         break;
 
                     case SUBSCRIBE: 
-                        send(PACKET_TYPE.SUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.SUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], receivedPacket.getAddress().getHostName(), receivedPacket.getPort()); // ACK
                                                                                                                         
-                        if(subscribers.containsKey(new String(payload).trim())) {
-                            subscribers.get(new String(payload).trim()).add(receivedPacket.getPort()); // Add to subscribers
-                        }
-
+                        if(subscribers.containsKey(new String(payload).trim())) 
+                            subscribers.get(new String(payload).trim()).add(new PortAddr(receivedPacket)); // Add to subscribers
                         break;
                     case UNSUBSCRIBE:
-                        send(PACKET_TYPE.UNSUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getPort()); // ACK
+                        send(PACKET_TYPE.UNSUBSCRIBE_ACK.getValue(), 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[] {}, receivedPacket.getAddress().getHostName(), receivedPacket.getPort()); // ACK
                         
-                        if(subscribers.containsKey(new String(payload).trim())) {
-                            subscribers.get(new String(payload).trim()).remove((Integer) receivedPacket.getPort()); // delete from subscribers
-                        }
-
+                        if(subscribers.containsKey(new String(payload).trim())) 
+                            subscribers.get(new String(payload).trim()).remove(new PortAddr(receivedPacket)); // delete from subscribers
                         break;
                     default:
                         break;
@@ -129,6 +125,32 @@ public class Broker extends NNode {
 
         }
 
+    }
+
+    class PortAddr {
+        private InetAddress addr;
+        private int port;
+
+        public PortAddr(DatagramPacket packet) {
+            this.addr = packet.getAddress();
+            this.port = packet.getPort();
+        }
+
+        public String getAddr() {
+            return addr.getHostName();
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj == null) return false;
+            PortAddr p = (PortAddr) obj;
+            return port == p.getPort();
+
+        }
     }
 
 }

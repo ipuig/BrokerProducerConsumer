@@ -7,8 +7,7 @@ public abstract class NNode {
 
     public static final int BROKER_PORT = 50_000;
     public static final int THREAD_POOL_SIZE = 10;
-    // not necessary since I am connecting the containers to the same network
-    //  public static final String BROKER_IP = "172.20.0.2";
+    public static String BROKER_IP = "172.17.0.5";
     public byte[] nodeId;
     public DatagramSocket serverSocket;
     public ExecutorService threadPool;
@@ -99,7 +98,7 @@ public abstract class NNode {
 
     }
 
-    public void send(byte type, int length, byte stream, byte label, short frameNumber, byte[] payload, int port) {
+    public void send(byte type, int length, byte stream, byte label, short frameNumber, byte[] payload, String ip,  int port) {
 
         Header header = new Header(type, length, nodeId, stream, label, frameNumber);
 
@@ -111,7 +110,7 @@ public abstract class NNode {
 
         // Create a DatagramPacket and send it to the broker
         try {
-            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName("localhost"), port);
+            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName(ip), port);
             serverSocket.send(sendPacket);
         }
         catch(Exception e) {
