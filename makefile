@@ -1,5 +1,5 @@
 compile:
-	sh cleanup; javac -cp bin -d bin src/*.java
+	sh cleanup.sh; javac -cp bin -d bin src/*.java
 
 producer:
 	java -cp bin Main producer
@@ -16,6 +16,3 @@ broker:
 
 ip:
 	java -cp bin Main
-
-clean:
-	rm consumer_data/audio/* && consumer_data/video/* && consumer_data/text/*
