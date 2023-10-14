@@ -5,6 +5,11 @@ Header (8 Bytes)
  1b    1b     3b      1b      2b
 [PT|Plength|NodeId|StreamId|Plabel] + [Payload]
 
+Header (8 Bytes) => 13 bytes
+
+ 1b    4b     3b      1b      2b
+[PT|Plength|NodeId|StreamId|Plabel] + [Payload]
+
 
 Packet types:
 
@@ -39,16 +44,21 @@ Node types:
     - Consumer 0xC
     - Producer 0xE
 
-StreamId (1 Byte)
+StreamId (1 Byte) 
 
 Stream types:
     - 0 is not a stream
-    - otherwise stream number
+    - otherwise stream type
+        - video 100 
+        - audio 50
+        - text 25
+        - 1 producer id
+        - 11 producer list
 
 PLabel 
 
-  1b     1b
-[PType][PTime]
+  1b     1b            2b
+[PType][PTime] => [Frame number]
         
 
 Payload types:

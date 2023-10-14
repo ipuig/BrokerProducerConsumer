@@ -17,8 +17,48 @@ public abstract class NNode {
         generateNodeId(nodeType);
     }
 
-    public static enum ProducerType {
-        VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER
+    public static enum PRODUCER_TYPE {
+        VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER;
+    }
+
+    public static enum PAYLOAD_TYPE {
+
+    }
+
+    public static enum PACKET_TYPE {
+
+        PUBLISH(10),
+        PUBLISH_ACK(60),
+        LIST_REQUEST(11), 
+        LIST_REQUEST_ACK(61),
+        LIST_DATA(12),
+        LIST_DATA_ACK(62),
+        SUBSCRIBE(13),
+        SUBSCRIBE_ACK(63),
+        UNSUBSCRIBE(14),
+        UNSUBSCRIBE_ACK(64),
+        FORWARD(15),
+        FORWARD_ACK(65),
+        ERROR(-1);
+
+        private byte value;
+
+        PACKET_TYPE(int value) {
+            this.value = (byte) value;
+        }
+
+        public byte getValue() {
+            return value;
+        }
+
+        public static PACKET_TYPE fromValue(byte value) {
+            for (PACKET_TYPE type : values()) {
+                if (type.value == value) return type;
+            }
+            return PACKET_TYPE.ERROR;
+
+        }
+
     }
 
     public void send(byte type, int length, byte stream, byte[] label, byte[] payload, int port) {

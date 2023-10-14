@@ -45,41 +45,41 @@ public abstract class Handler {
 
     public void printPacketData() {
 
-            switch(receivedPacketType) {
-                case 10:
+            switch(NNode.PACKET_TYPE.fromValue(receivedPacketType)) {
+                case PUBLISH:
                     System.out.println("Received Packet Type: PUBLISH");
                     break;
-                case 60:
+                case PUBLISH_ACK:
                     System.out.println("Received ACK from Broker");
                     break;
-                case 11:
+                case LIST_REQUEST:
                     System.out.println("Received Packet Type: LREQUEST");
                     break;
-                case 61:
+                case LIST_REQUEST_ACK:
                     System.out.println("Received ACK from Broker");
                     break;
-                case 12:
+                case LIST_DATA:
                     System.out.println("Received Packet Type: LDATA");
                     break;
-                case 62:
+                case LIST_DATA_ACK:
                     System.out.println("Received ACK from Consumer");
                     break;
-                case 13:
+                case SUBSCRIBE:
                     System.out.println("Received Packet Type: SUBSCRIBE");
                     break;
-                case 63:
+                case SUBSCRIBE_ACK:
                     System.out.println("Received ACK from Broker");
                     break;
-                case 14:
+                case UNSUBSCRIBE:
                     System.out.println("Received Packet Type: UNSUBSCRIBE");
                     break;
-                case 64:
+                case UNSUBSCRIBE_ACK:
                     System.out.println("Received ACK from Broker");
                     break;
-                case 15:
+                case FORWARD:
                     System.out.println("Received Packet Type: FORWARD");
                     break;
-                case 65:
+                case FORWARD_ACK:
                     System.out.println("Received ACK from Consumer");
                     break;
 

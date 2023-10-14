@@ -2,8 +2,8 @@ public class Main {
 
     private static Producer createProducer(String[] args) {
         if (args.length < 2) return new Producer(); 
-        if (args[1].equalsIgnoreCase("video")) return new Producer(NNode.ProducerType.VIDEO_STREAMER);
-        return new Producer(NNode.ProducerType.AUDIO_STREAMER);
+        if (args[1].equalsIgnoreCase("video")) return new Producer(NNode.PRODUCER_TYPE.VIDEO_STREAMER);
+        return new Producer(NNode.PRODUCER_TYPE.AUDIO_STREAMER);
     }
 
     public static void main(String[] args) throws Exception {

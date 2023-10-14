@@ -67,10 +67,10 @@ public class Broker extends NNode {
                 printPacketData();
                 String encodedId = encodeId(receivedProducerIdentifier);
                 byte[] decodedId;
-                switch(receivedPacketType) {
+                switch(PACKET_TYPE.fromValue(receivedPacketType)) {
 
-                    case 10: // publish
-                        send((byte) 60, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort());
+                    case PUBLISH: 
+                        send(PACKET_TYPE.PUBLISH_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort());
                         subscribers.putIfAbsent(encodedId, new ArrayList<Integer>(List.of(receivedPacket.getPort())));
 
                         List<Integer> forwardPorts = subscribers.get(encodedId);
@@ -82,15 +82,15 @@ public class Broker extends NNode {
                             while(ports.hasNext()) {
 
                                 Integer val = (Integer) ports.next();
-                                send((byte) 15, receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, payload, val.intValue());
+                                send(PACKET_TYPE.FORWARD.getValue(), receivedPayloadLength, receivedStreamIdentifier, receivedPayloadLabel, payload, val.intValue());
                                 
                             }
 
                         }
                         break;
 
-                    case 11: // list request
-                        send((byte) 61, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                    case LIST_REQUEST:
+                        send(PACKET_TYPE.LIST_REQUEST_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
 
                         // Fetching list of producers
                         StringBuilder sb = new StringBuilder();
@@ -99,19 +99,19 @@ public class Broker extends NNode {
                         byte[] listDataPayload = listData.getBytes();
 
                         // Send list
-                        send((byte) 12, (byte) listDataPayload.length, (byte) 0, new byte[] {0,0}, listDataPayload, receivedPacket.getPort());
+                        send(PACKET_TYPE.LIST_DATA.getValue(), listDataPayload.length, (byte) 0, new byte[] {0,0}, listDataPayload, receivedPacket.getPort());
                         break;
 
-                    case 13: // subscribe request
-                        send((byte) 63, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                    case SUBSCRIBE: 
+                        send(PACKET_TYPE.SUBSCRIBE_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
                                                                                                                         
                         if(subscribers.containsKey(new String(payload).trim())) {
                             subscribers.get(new String(payload).trim()).add(receivedPacket.getPort()); // Add to subscribers
                         }
 
                         break;
-                    case 14: // unsubscribe request
-                        send((byte) 64, (byte) 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
+                    case UNSUBSCRIBE:
+                        send(PACKET_TYPE.UNSUBSCRIBE_ACK.getValue(), 0, (byte) 0, new byte[] {0,0}, new byte[] {}, receivedPacket.getPort()); // ACK
                         
                         if(subscribers.containsKey(new String(payload).trim())) {
                             subscribers.get(new String(payload).trim()).remove((Integer) receivedPacket.getPort()); // delete from subscribers

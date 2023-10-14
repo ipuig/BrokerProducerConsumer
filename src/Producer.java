@@ -5,13 +5,13 @@ import java.util.concurrent.Executors;
 
 public class Producer extends NNode implements Stream {
 
-    private ProducerType mode;
+    private PRODUCER_TYPE mode;
 
     public Producer() {
 
         super((byte) 0xE); 
 
-        this.mode = ProducerType.TEXT_STREAMER;
+        this.mode = PRODUCER_TYPE.TEXT_STREAMER;
 
         try {
             this.serverSocket = new DatagramSocket();
@@ -21,7 +21,7 @@ public class Producer extends NNode implements Stream {
         }
     }
 
-    public Producer(ProducerType mode) {
+    public Producer(PRODUCER_TYPE mode) {
 
         super((byte) 0xE); 
 
@@ -38,20 +38,20 @@ public class Producer extends NNode implements Stream {
     private boolean streamVideo(int currentVideoFrame) {
         byte[] payload = loadFile(PRODUCER_VIDEO_FRAMES_PATH + String.format("frame%03d.png", currentVideoFrame));
         if (payload.length == 0) return false;
-        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
         return true;
     }
 
     private boolean streamAudio(int currentAudioChunk) {
         byte[] payload = loadFile(PRODUCER_AUDIO_CHUNKS_PATH + String.format("chunk%03d.wav", currentAudioChunk));
         if (payload.length == 0) return false;
-        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
         return true;
     }
 
     private void streamText() {
         byte[] payload = generateRandomString();
-        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
+        send(PACKET_TYPE.PUBLISH.getValue(), payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
     }
 
 
