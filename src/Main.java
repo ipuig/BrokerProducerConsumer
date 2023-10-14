@@ -1,13 +1,12 @@
 public class Main {
 
     private static Producer createProducer(String[] args) {
-        if (args.length < 2) return new Producer(); // text
-        if (args[1].equalsIgnoreCase("video")) return new Producer(1); // video
-        return new Producer(2); // audio
+        if (args.length < 2) return new Producer(); 
+        if (args[1].equalsIgnoreCase("video")) return new Producer(NNode.ProducerType.VIDEO_STREAMER);
+        return new Producer(NNode.ProducerType.AUDIO_STREAMER);
     }
 
     public static void main(String[] args) throws Exception {
-
 
         if(args.length == 0) {
             GetIp.getIp();
@@ -15,21 +14,11 @@ public class Main {
         } 
 
         NNode svr;
-        
 
-        if(args[0].equalsIgnoreCase("broker")) {
-            svr = new Broker();
-        } 
-        else if(args[0].equalsIgnoreCase("producer")) {
-            svr = createProducer(args);
-
-        }
-        else {
-            svr = new Consumer();
-        }
+        if(args[0].equalsIgnoreCase("broker")) svr = new Broker();
+        else if(args[0].equalsIgnoreCase("producer")) svr = createProducer(args);
+        else svr = new Consumer();
 
         svr.start();
-        
     }
-    
 }

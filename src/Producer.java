@@ -5,13 +5,13 @@ import java.util.concurrent.Executors;
 
 public class Producer extends NNode {
 
-    private Mode producerType;
+    private ProducerType mode;
 
     public Producer() {
 
         super((byte) 0xE); 
 
-        producerType = Mode.TEXT_STREAMER;
+        this.mode = ProducerType.TEXT_STREAMER;
 
         try {
             this.serverSocket = new DatagramSocket();
@@ -21,12 +21,11 @@ public class Producer extends NNode {
         }
     }
 
-    public Producer(int n) {
+    public Producer(ProducerType mode) {
 
         super((byte) 0xE); 
 
-        if (n == 1) producerType = Mode.VIDEO_STREAMER;
-        else if (n == 2) producerType = Mode.AUDIO_STREAMER;
+        this.mode = mode;
 
         try {
             this.serverSocket = new DatagramSocket();
@@ -47,12 +46,15 @@ public class Producer extends NNode {
                 new Thread(() -> receive()).start(); 
                 Thread.sleep(2000);
 
-                switch(producerType) {
+                switch(mode) {
                     case AUDIO_STREAMER:
+                        System.out.println("Audio producer");
                         break;
                     case VIDEO_STREAMER:
+                        System.out.println("Video producer");
                         break;
                     case TEXT_STREAMER:
+                        System.out.println("Text producer");
                         break;
                 }
 
@@ -102,8 +104,5 @@ public class Producer extends NNode {
 
     }
 
-    private static enum Mode {
-        VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER
-    }
     
 }

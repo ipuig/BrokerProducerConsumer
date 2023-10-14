@@ -1,15 +1,15 @@
 import java.nio.ByteBuffer;
 
 public class Header {
-    public static byte HEADER_LENGTH = 8;
+    public static byte HEADER_LENGTH = 11;
     private byte packetType;
-    private byte payloadLength;
+    private int payloadLength;
     private byte[] producerIdentifier;
     private byte streamIdentifier;
     private byte[] payloadLabel;
 
     // Constructor to initialize header fields
-    public Header(byte packetType, byte payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte[] payloadLabel) {
+    public Header(byte packetType, int payloadLength, byte[] producerIdentifier, byte streamIdentifier, byte[] payloadLabel) {
         this.packetType = packetType;
         this.payloadLength = payloadLength;
         this.producerIdentifier = producerIdentifier;
@@ -21,7 +21,7 @@ public class Header {
     public byte[] encode() {
         ByteBuffer buffer = ByteBuffer.allocate(HEADER_LENGTH + payloadLabel.length);
         buffer.put(packetType);
-        buffer.put(payloadLength);
+        buffer.putInt(payloadLength);
         buffer.put(producerIdentifier);
         buffer.put(streamIdentifier);
         buffer.put(payloadLabel);
@@ -32,7 +32,7 @@ public class Header {
     public static Header decode(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         byte packetType = buffer.get();
-        byte payloadLength = buffer.get();
+        int payloadLength = buffer.getInt();
         byte[] producerIdentifier = new byte[3];
         buffer.get(producerIdentifier);
         byte streamIdentifier = buffer.get();
@@ -47,7 +47,7 @@ public class Header {
         return packetType;
     }
 
-    public byte getPayloadLength() {
+    public int getPayloadLength() {
         return payloadLength;
     }
 

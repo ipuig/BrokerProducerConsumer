@@ -15,7 +15,7 @@ public abstract class Handler {
     public int packetLength;
     public Header receivedHeader;
     public byte receivedPacketType;
-    public byte receivedPayloadLength;
+    public int receivedPayloadLength;
     public byte receivedStreamIdentifier;
     public byte[] receivedProducerIdentifier;
     public byte[] receivedPayloadLabel;

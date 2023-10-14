@@ -17,7 +17,11 @@ public abstract class NNode {
         generateNodeId(nodeType);
     }
 
-    public void send(byte type, byte length, byte stream, byte[] label, byte[] payload, int port) {
+    public static enum ProducerType {
+        VIDEO_STREAMER, AUDIO_STREAMER, TEXT_STREAMER
+    }
+
+    public void send(byte type, int length, byte stream, byte[] label, byte[] payload, int port) {
 
         Header header = new Header(type, length, nodeId, stream, label);
 
