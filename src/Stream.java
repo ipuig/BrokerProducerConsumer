@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Random;
 
 public interface Stream {
     
@@ -32,4 +33,23 @@ public interface Stream {
     // default void storeFile() {
     //
     // }
+    //
+
+    public default byte[] generateRandomString() {
+        Random random = new Random();
+        int length = random.nextInt(1024) + 1; 
+        StringBuilder stringBuilder = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            char randomChar = (char) (random.nextInt(62) + 48);
+            if (randomChar > 57) randomChar += 7; 
+            if (randomChar > 90) randomChar += 6; 
+            stringBuilder.append(randomChar);
+        }
+
+        String result = "Randomly generated string: { " + stringBuilder.toString() + " }\n";
+
+        return result.getBytes();
+    }
+
 }

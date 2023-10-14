@@ -50,6 +50,8 @@ public class Producer extends NNode implements Stream {
     }
 
     private void streamText() {
+        byte[] payload = generateRandomString();
+        send((byte) 10, payload.length, (byte) 1, new byte[] {0xF, 1}, payload, BROKER_PORT);
     }
 
 
