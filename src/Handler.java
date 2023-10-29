@@ -84,6 +84,9 @@ public abstract class Handler {
                 case FORWARD_ACK:
                     System.out.println("Received ACK from Consumer");
                     break;
+                default:
+                case ERROR:
+                    break;
 
             }
 

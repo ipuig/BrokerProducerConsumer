@@ -7,7 +7,7 @@ public abstract class NNode {
 
     public static final int BROKER_PORT = 50_000;
     public static final int THREAD_POOL_SIZE = 10;
-    public static String BROKER_IP = "172.17.0.5";
+    public static String BROKER_IP = "172.17.0.2";
     public byte[] nodeId;
     public DatagramSocket serverSocket;
     public ExecutorService threadPool;
@@ -110,7 +110,8 @@ public abstract class NNode {
 
         // Create a DatagramPacket and send it to the broker
         try {
-            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName(ip), port);
+            // DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getByName(ip), port);
+            DatagramPacket sendPacket = new DatagramPacket(packetData, packetData.length, InetAddress.getLocalHost(), port);
             serverSocket.send(sendPacket);
         }
         catch(Exception e) {

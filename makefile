@@ -1,7 +1,7 @@
 compile:
 	sh cleanup.sh; javac -cp bin -d bin src/*.java
 
-producer:
+text:
 	java -cp bin Main producer
 audio:
 	java -cp bin Main producer audio

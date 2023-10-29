@@ -87,7 +87,8 @@ public class Consumer extends NNode {
         }
     }
 
-    private static class ConsumerHandler extends Handler implements Runnable, Stream {
+    private class ConsumerHandler extends Handler implements Runnable, Stream {
+
 
         public ConsumerHandler(DatagramSocket server, DatagramPacket packet) {
             super(server, packet);
@@ -101,25 +102,33 @@ public class Consumer extends NNode {
                 unpack();
                 printPacketData();
 
-                // store video, audio, text
-                if (PACKET_TYPE.fromValue(receivedPacketType) == PACKET_TYPE.FORWARD) {
+                switch(NNode.PACKET_TYPE.fromValue(receivedPacketType)) {
+                    case FORWARD:
+                        switch(NNode.PAYLOAD_TYPE.fromValue(receivedPayloadLabel)) {
+                            case VIDEO:
+                                storeFile(CONSUMER_DATA_OUTPUT + "video/" + String.format("receivedFrame%03d.png", receivedFrameNumber), payload);
+                                break;
+                            case AUDIO:
+                                storeFile(CONSUMER_DATA_OUTPUT + "audio/" + String.format("receivedAudio%03d.wav", receivedFrameNumber), payload);
+                                break;
+                            case TEXT:
+                                storeFile(CONSUMER_DATA_OUTPUT + "text/" + String.format("receivedText%03d.txt", receivedFrameNumber), payload);
+                                break;
+                            default:
+                            case NOTHING:
+                                break;
+                        }
+                        send(PACKET_TYPE.FORWARD_ACK.getValue(), (byte) 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], BROKER_IP, BROKER_PORT);
+                        break;
 
+                    case LIST_DATA:
+                        send(PACKET_TYPE.LIST_DATA_ACK.getValue(), (byte) 0, (byte) 0, PAYLOAD_TYPE.NOTHING.getValue(), (short) 0, new byte[0], BROKER_IP, BROKER_PORT);
+                        break;
 
-                    switch(PAYLOAD_TYPE.fromValue(receivedPayloadLabel)) {
-                        case VIDEO:
-                            storeFile(CONSUMER_DATA_OUTPUT + "video/" + String.format("receivedFrame%03d.png", receivedFrameNumber), payload);
-                            break;
-                        case AUDIO:
-                            storeFile(CONSUMER_DATA_OUTPUT + "audio/" + String.format("receivedAudio%03d.wav", receivedFrameNumber), payload);
-                            break;
-                        case TEXT:
-                            storeFile(CONSUMER_DATA_OUTPUT + "text/" + String.format("receivedText%03d.txt", receivedFrameNumber), payload);
-                            break;
-                        default:
-                        case NOTHING:
-                            break;
-                    }
                 }
+
+
+
                 
             } catch (Exception e) {
 

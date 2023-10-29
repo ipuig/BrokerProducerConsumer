@@ -105,7 +105,7 @@ public class Producer extends NNode implements Stream {
 
     }
 
-    private static class ProducerHandler extends Handler implements Runnable {
+    private class ProducerHandler extends Handler implements Runnable {
 
         public ProducerHandler(DatagramSocket server, DatagramPacket packet) {
             super(server, packet);
